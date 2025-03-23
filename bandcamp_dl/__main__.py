@@ -22,6 +22,7 @@ import argparse
 import logging
 import pathlib
 import sys
+import json
 
 from bandcamp_dl import __version__
 from bandcamp_dl.bandcamp import Bandcamp
@@ -68,6 +69,8 @@ def main():
                         default=conf.ascii_only)
     parser.add_argument('-k', '--keep-spaces', help='Retain whitespace in filenames',
                         action='store_true', default=conf.keep_spaces)
+    parser.add_argument('-j', '--dump-json', help='Print JSON information and skip audio download',
+                        action='store_true', default=conf.dump_json)
     parser.add_argument('-u', '--keep-upper', help='Retain uppercase letters in filenames',
                         action='store_true', default=conf.keep_upper)
     parser.add_argument('--no-confirm', help='Override confirmation prompts. Use with caution',
@@ -127,13 +130,22 @@ def main():
             album_list.remove(album)
 
     if arguments.URL or arguments.artist:
-        logger.debug("Preparing download process..")
-        for album in album_list:
-            bandcamp_downloader = BandcampDownloader(arguments, album['url'])
-            logger.debug("Initiating download process..")
-            bandcamp_downloader.start(album)
-            # Add a newline to stop prompt mangling
-            print("")
+        if arguments.dump_json:
+            logger.debug(" Printing album JSON..")
+            if len(album_list) == 1:
+                print(json.dumps(album_list[0]))
+            else:
+                print(json.dumps(album_list))
+                # for album in album_list:
+                #     print(json.dumps(album))
+        else:
+            logger.debug("Preparing download process..")
+            for album in album_list:
+                bandcamp_downloader = BandcampDownloader(arguments, album['url'])
+                logger.debug("Initiating download process..")
+                bandcamp_downloader.start(album)
+                # Add a newline to stop prompt mangling
+                print("")
     else:
         logger.debug(r" /!\ Something went horribly wrong /!\ ")
 

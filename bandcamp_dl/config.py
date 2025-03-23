@@ -32,6 +32,7 @@ class Config(dict):
                  "ascii_only": False,
                  "keep_spaces": False,
                  "keep_upper": False,
+                 "dump_json": False,
                  "no_confirm": False,
                  "debug": False,
                  "embed_genres": False}
